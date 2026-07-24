@@ -9,6 +9,8 @@ Text {
 
     MouseArea {
         anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
+
         onClicked: Quickshell.execDetached(["kitty", "btop"])
     }
 }

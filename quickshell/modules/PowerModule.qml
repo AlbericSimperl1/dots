@@ -9,6 +9,7 @@ Text {
 
     MouseArea {
         anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
         onClicked: Quickshell.execDetached(["wlogout", "-b", "5"])
     }
 }

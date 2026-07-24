@@ -27,7 +27,7 @@ Item {
         command: ["bash", "-c", "while true; do " + "  bat_dir=$(ls -d /sys/class/power_supply/BAT* 2>/dev/null | head -n 1); " + "  if [ -n \"$bat_dir\" ]; then " + "    pct=$(cat \"$bat_dir/capacity\"); " + "    status=$(cat \"$bat_dir/status\"); " + "    echo \"$pct|$status\"; " + "  else " + "    echo \"0|Unknown\"; " + "  fi; " + "  sleep 5; " + "done"]
 
         stdout: SplitParser {
-            onRead: (line) => {
+            onRead: line => {
                 let parts = line.trim().split("|");
                 if (parts.length >= 2) {
                     root.batteryPercentage = parseInt(parts[0]) || 0;
@@ -35,7 +35,6 @@ Item {
                 }
             }
         }
-
     }
 
     RowLayout {
@@ -120,9 +119,9 @@ Item {
 
         MouseArea {
             anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+
             onClicked: Quickshell.execDetached(["omarchy-menu", "power"])
         }
-
     }
-
 }

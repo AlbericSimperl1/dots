@@ -34,8 +34,8 @@ ShellRoot {
     readonly property int collapsedHeight: 4
 
     readonly property int collapsedWidth: 130
-    readonly property int expandedWidthL: 380
-    readonly property int expandedWidthR: 345
+    readonly property int expandedWidthL: 480
+    readonly property int expandedWidthR: 415
     readonly property int musicExpandedHeight: 250
     readonly property int networkExpandedHeight: 200
     readonly property int notchDepth: 5
@@ -312,15 +312,16 @@ ShellRoot {
                                 }
                             }
 
-                            NetworkModuleNEW {
+                            NetworkModule {
                                 id: network
                                 onOpenChanged: {
                                     rightPanel.networkOpen = open;
                                 }
                             }
-
+                            HyprStreamModule {}
                             CpuModule {}
                             PowerModule {}
+                            BrightnessModule {}
                             BatteryModule {}
                             DateModule {}
                         }

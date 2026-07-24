@@ -13,10 +13,17 @@ Text {
     }
     text: fmt()
 
-    Timer { interval: 60000; running: true; repeat: true; onTriggered: dateText.text = dateText.fmt() }
+    Timer {
+        interval: 60000
+        running: true
+        repeat: true
+        onTriggered: dateText.text = dateText.fmt()
+    }
 
     MouseArea {
         anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
+
         onClicked: Quickshell.execDetached(["/usr/bin/rencal"])
     }
 }
