@@ -1,0 +1,14 @@
+import QtQuick
+import Quickshell
+
+Text {
+    color: "#fff7e5"
+    font.family: "JetBrainsMono Nerd Font Mono"
+    font.pixelSize: 19
+    text: "⏼"
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: Quickshell.execDetached(["wlogout", "-b", "5"])
+    }
+}

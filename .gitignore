@@ -1,0 +1,19 @@
+# Negeer alles standaard
+/*
+
+# Maar sta deze specifieke mappen toe (en hun inhoud)
+!/.gitignore
+!/hypr/
+!/quickshell/
+!/zed/
+# !/zen/
+#
+# # Binnen Zen, negeer alle dynamische / gevoelige rommel
+# zen/**/cache*
+# zen/**/Cache*
+# zen/**/*.sqlite
+# zen/**/*.sqlite-wal
+# zen/**/*.baklz4
+# zen/**/*.jsonlz4
+# zen/**/startupCache
+# zen/**/crashes
