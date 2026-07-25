@@ -11,11 +11,13 @@ Item {
 
     property var screen: null
     property bool open: false
-    readonly property color fg: "#fff7e5"
-    readonly property color accent: "#fff7e5"
-    readonly property color muted: "#ffffff"
-    readonly property color softFill: "#ffffff"
-    readonly property string fontFamily: "JetBrainsMono Nerd Font Mono"
+    property color fg: "#fff7e5"
+    property color accent: "#fff7e5"
+    property color muted: "#ffffff"
+    property color softFill: "#ffffff"
+    property color borderCol: "#eb2e2e3d"
+    property string fontFamily: "JetBrainsMono Nerd Font Mono"
+
     property int volumePct: 0
     property bool volumeMuted: false
     property var cavaBars: []
@@ -151,7 +153,6 @@ Item {
                     vals.push(isNaN(v) ? 0 : Math.max(0, Math.min(1, v / 12)));
                 }
                 root.cavaBars = vals;
-                cavaCanvas.requestPaint();
             }
         }
     }

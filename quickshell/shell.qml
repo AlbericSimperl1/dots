@@ -1,5 +1,3 @@
-// notches
-
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -38,6 +36,7 @@ ShellRoot {
     readonly property int expandedWidthR: 445
     readonly property int musicExpandedHeight: 250
     readonly property int networkExpandedHeight: 200
+    readonly property int bluetoothExpandedHeight: 200
     readonly property int notchDepth: 5
     readonly property int cornerRadius: 11
 
@@ -50,15 +49,14 @@ ShellRoot {
 
             required property var modelData
             property bool leftHovered: false
-            property bool leftHoveredDelayed: false          // <-- vertraagde hover voor inklap
-            property bool leftExpanded: leftHoveredDelayed   // <-- nu gekoppeld aan de vertraagde waarde
+            property bool leftHoveredDelayed: false
+            property bool leftExpanded: leftHoveredDelayed
 
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
             color: "transparent"
             margins.left: 10
 
-            // Stabiele breedte-bepaling (layout is altijd zichtbaar)
             property int contentWidth: leftLayout.implicitWidth + root.notchDepth * 2 + 20
             property int targetWidth: Math.min(root.expandedWidthL, Math.max(root.collapsedWidth, contentWidth))
 
@@ -71,10 +69,9 @@ ShellRoot {
                 left: true
             }
 
-            // Timer om inklappen even uit te stellen en zo oscillatie te voorkomen
             Timer {
                 id: leftCloseTimer
-                interval: 20   // 200 ms vertraging – ruim genoeg om de muis op zijn plek te houden
+                interval: 20
                 onTriggered: leftPanel.leftHoveredDelayed = false
             }
 
@@ -111,7 +108,6 @@ ShellRoot {
                     }
                 }
 
-                // Inhoud – blijft altijd zichtbaar, maar werkt alleen als de bar open is
                 Item {
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -124,13 +120,11 @@ ShellRoot {
                         id: leftLayout
                         anchors.left: parent.left
                         anchors.leftMargin: root.notchDepth + 10
-                        // OPMERKING: anchors.right is hier verwijderd om samendrukken te voorkomen!
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 10
 
                         Workspaces {}
-                        AppLauncher {}
-                        // ClockModule {}
+                        Apps {}
                     }
                 }
             }
@@ -141,7 +135,7 @@ ShellRoot {
 
             Behavior on width {
                 NumberAnimation {
-                    duration: 10 // Verhoogd naar 150ms voor een vloeiende overgang
+                    duration: 10
                     easing.type: Easing.Linear
                 }
             }
@@ -173,10 +167,10 @@ ShellRoot {
                 if (networkOpen)
                     return root.networkExpandedHeight;
                 if (bluetoothOpen)
-                    return 200;
+                    return root.bluetoothExpandedHeight;
                 if (rightExpanded)
                     return root.barHeightR;
-                return 12; // Vaste, makkelijk triggerbare hover-zone in rust
+                return 12;
             }
             exclusiveZone: 0
             onRightHoveredChanged: {
@@ -184,10 +178,12 @@ ShellRoot {
                     musicCloseTimer.start();
                 else if (rightHovered)
                     musicCloseTimer.stop();
+
                 if (!rightHovered && networkOpen)
                     networkCloseTimer.start();
                 else if (rightHovered)
                     networkCloseTimer.stop();
+
                 if (!rightHovered && bluetoothOpen)
                     bluetoothCloseTimer.start();
                 else if (rightHovered)
@@ -198,6 +194,7 @@ ShellRoot {
                 if (musicOpen) {
                     musicCloseTimer.stop();
                     network.open = false;
+                    bluetoothOpen = false;
                 }
             }
             onNetworkOpenChanged: {
@@ -205,9 +202,12 @@ ShellRoot {
                 if (networkOpen) {
                     networkCloseTimer.stop();
                     music.open = false;
+                    bluetoothOpen = false;
                 }
             }
             onBluetoothOpenChanged: {
+                if (bluetooth)
+                    bluetooth.open = bluetoothOpen;
                 if (bluetoothOpen) {
                     bluetoothCloseTimer.stop();
                     music.open = false;
@@ -269,7 +269,7 @@ ShellRoot {
                         if (rightPanel.networkOpen)
                             return root.networkExpandedHeight;
                         if (rightPanel.bluetoothOpen)
-                            return 200;
+                            return root.bluetoothExpandedHeight;
                         if (rightPanel.rightExpanded)
                             return root.barHeightR;
                         return root.collapsedHeight;
@@ -308,269 +308,79 @@ ShellRoot {
                             MusicModule {
                                 id: music
                                 screen: rightPanel.modelData
+                                fg: root.fg
+                                accent: root.accent
+                                muted: root.muted
+                                softFill: root.softFill
+                                borderCol: root.borderCol
+                                fontFamily: root.fontFamily
                                 onOpenChanged: {
                                     rightPanel.musicOpen = open;
                                 }
                             }
 
-                            NetworkModule {
+                            Network {
                                 id: network
+                                fg: root.fg
+                                accent: root.accent
+                                muted: root.muted
+                                softFill: root.softFill
+                                borderCol: root.borderCol
+                                fontFamily: root.fontFamily
                                 onOpenChanged: {
                                     rightPanel.networkOpen = open;
                                 }
                             }
-                            HyprStreamModule {}
-                            CpuModule {}
-                            PowerModule {}
-                            BrightnessModule {}
-                            BatteryModule {}
+
+                            // Bluetooth {
+                            //     id: bluetooth
+                            //     onOpenChanged: {
+                            //         rightPanel.bluetoothOpen = open;
+                            //     }
+                            // }
+
+                            HyprStream {}
+                            Cpu {}
+                            Power {}
+                            Brightness {}
+                            Battery {}
                             DateModule {}
                         }
 
-                        // ---- Muziekbediening ----
-                        Item {
+                        // ---- Muziekbediening Dropdown ----
+                        MusicDropdown {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             visible: rightPanel.musicOpen
-                            opacity: rightPanel.musicOpen ? 1 : 0
-
-                            Rectangle {
-                                anchors.fill: parent
-                                color: "transparent"
-                                clip: true
-
-                                RowLayout {
-                                    anchors.fill: parent
-                                    spacing: 18
-
-                                    ColumnLayout {
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        spacing: 6
-
-                                        Canvas {
-                                            id: cavaCanvas
-                                            Layout.fillWidth: true
-                                            Layout.fillHeight: true
-                                            Layout.minimumHeight: 36
-                                            renderTarget: Canvas.Image
-                                            renderStrategy: Canvas.Threaded
-                                            onPaint: {
-                                                const ctx = getContext("2d");
-                                                ctx.clearRect(0, 0, width, height);
-                                                const vals = music.cavaBars || [];
-                                                const count = vals.length || 32;
-                                                const slot = width / count;
-                                                const mid = height / 2;
-                                                const maxH = height * 0.45;
-                                                ctx.fillStyle = root.accent;
-                                                for (let i = 0; i < count; i++) {
-                                                    const value = vals.length ? vals[i] : 0;
-                                                    const h = Math.max(2, value * maxH);
-                                                    const barW = Math.max(2, Math.min(6, slot * 0.4));
-                                                    const x = Math.round(i * slot + (slot - barW) / 2);
-                                                    ctx.globalAlpha = 0.35 + value * 0.65;
-                                                    ctx.fillRect(x, mid - h, barW, h * 2);
-                                                }
-                                                ctx.globalAlpha = 1;
-                                            }
-                                            onWidthChanged: requestPaint()
-                                            onHeightChanged: requestPaint()
-                                        }
-
-                                        ColumnLayout {
-                                            Layout.fillWidth: true
-                                            spacing: 1
-
-                                            Text {
-                                                Layout.fillWidth: true
-                                                text: music.title
-                                                color: root.fg
-                                                font.family: root.fontFamily
-                                                font.pixelSize: 16
-                                                font.bold: true
-                                                horizontalAlignment: Text.AlignHCenter
-                                                elide: Text.ElideRight
-                                            }
-
-                                            Text {
-                                                Layout.fillWidth: true
-                                                text: music.artist
-                                                color: root.muted
-                                                font.family: root.fontFamily
-                                                font.pixelSize: 14
-                                                font.weight: Font.DemiBold
-                                                horizontalAlignment: Text.AlignHCenter
-                                                elide: Text.ElideRight
-                                            }
-                                        }
-
-                                        RowLayout {
-                                            Layout.fillWidth: true
-                                            Layout.alignment: Qt.AlignHCenter
-                                            spacing: 12
-
-                                            MusicButton {
-                                                glyph: "󰒮"
-                                                enabled: music.activePlayer && music.activePlayer.canGoPrevious
-                                                onPressed: music.activePlayer.previous()
-                                            }
-
-                                            MusicButton {
-                                                glyph: music.isPlaying ? "󰏤" : "󰐊"
-                                                enabled: music.hasPlayer
-                                                big: true
-                                                onPressed: music.activePlayer.togglePlaying()
-                                            }
-
-                                            MusicButton {
-                                                glyph: "󰒭"
-                                                enabled: music.activePlayer && music.activePlayer.canGoNext
-                                                onPressed: music.activePlayer.next()
-                                            }
-                                        }
-
-                                        ColumnLayout {
-                                            Layout.fillWidth: true
-                                            Layout.bottomMargin: 15
-                                            spacing: 2
-
-                                            RowLayout {
-                                                Layout.fillWidth: true
-
-                                                Text {
-                                                    text: music.fmtTime(music.trackPosition)
-                                                    color: root.muted
-                                                    font.family: root.fontFamily
-                                                    font.pixelSize: 11
-                                                }
-
-                                                Item {
-                                                    Layout.fillWidth: true
-                                                }
-
-                                                Text {
-                                                    text: music.trackLength > 0 ? music.fmtTime(music.trackLength) : "--:--"
-                                                    color: root.muted
-                                                    font.family: root.fontFamily
-                                                    font.pixelSize: 11
-                                                }
-                                            }
-
-                                            Rectangle {
-                                                Layout.fillWidth: true
-                                                Layout.preferredHeight: 4
-                                                radius: 2
-                                                color: root.softFill
-
-                                                Rectangle {
-                                                    anchors.left: parent.left
-                                                    anchors.top: parent.top
-                                                    anchors.bottom: parent.bottom
-                                                    width: Math.max(parent.height, parent.width * music.progressRatio)
-                                                    radius: parent.radius
-                                                    color: root.accent
-                                                    opacity: music.canSeek ? 0.9 : 0.45
-                                                }
-
-                                                MouseArea {
-                                                    anchors.fill: parent
-                                                    enabled: music.canSeek
-                                                    cursorShape: Qt.PointingHandCursor
-                                                    onPressed: music.seekToRatio(mouse.x / width)
-                                                    onPositionChanged: {
-                                                        if (pressed)
-                                                            music.seekToRatio(mouse.x / width);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    Rectangle {
-                                        Layout.fillHeight: true
-                                        Layout.preferredWidth: 1
-                                        Layout.topMargin: 4
-                                        Layout.bottomMargin: 4
-                                        color: root.borderCol
-                                        opacity: 0.3
-                                    }
-
-                                    ColumnLayout {
-                                        Layout.fillHeight: true
-                                        Layout.preferredWidth: 24
-                                        Layout.topMargin: 15
-                                        Layout.bottomMargin: 12
-                                        spacing: 4
-
-                                        Text {
-                                            id: volText
-                                            Layout.alignment: Qt.AlignHCenter
-                                            text: music.volumePct + "%"
-                                            color: root.fg
-                                            font.family: root.fontFamily
-                                            font.pixelSize: 11
-                                        }
-
-                                        Rectangle {
-                                            Layout.fillHeight: true
-                                            Layout.preferredWidth: 4
-                                            Layout.alignment: Qt.AlignHCenter
-                                            radius: 2
-                                            color: root.softFill
-
-                                            Rectangle {
-                                                anchors.left: parent.left
-                                                anchors.right: parent.right
-                                                anchors.bottom: parent.bottom
-                                                height: parent.height * (music.volumePct / 100)
-                                                radius: parent.radius
-                                                color: root.accent
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                anchors.margins: -8
-                                                cursorShape: Qt.PointingHandCursor
-                                                hoverEnabled: true
-                                                onPressed: music.setVolume((1 - mouse.y / height) * 100)
-                                                onPositionChanged: {
-                                                    if (pressed)
-                                                        music.setVolume((1 - mouse.y / height) * 100);
-                                                }
-                                                onWheel: wheel => {
-                                                    if (wheel.angleDelta.y > 0)
-                                                        music.bumpVolume(5);
-                                                    else
-                                                        music.bumpVolume(-5);
-                                                }
-                                            }
-                                        }
-
-                                        Text {
-                                            Layout.alignment: Qt.AlignHCenter
-                                            text: music.volumeMuted ? "󰝟" : "󰕾"
-                                            color: music.volumeMuted ? root.muted : root.fg
-                                            font.family: root.fontFamily
-                                            font.pixelSize: 13
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: Quickshell.execDetached(["pamixer", "-t"])
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            music: music
+                            fg: root.fg
+                            accent: root.accent
+                            muted: root.muted
+                            softFill: root.softFill
+                            borderCol: root.borderCol
+                            fontFamily: root.fontFamily
                         }
 
                         // ---- Netwerkinformatie Dropdown ----
-                        Item {
+                        NetworkDropdown {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             visible: rightPanel.networkOpen
-                            opacity: rightPanel.networkOpen ? 1 : 0
+                            network: network
+                            fg: root.fg
+                            accent: root.accent
+                            muted: root.muted
+                            softFill: root.softFill
+                            borderCol: root.borderCol
+                            fontFamily: root.fontFamily
+                        }
+
+                        // ---- Bluetooth Dropdown ----
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            visible: rightPanel.bluetoothOpen
+                            opacity: rightPanel.bluetoothOpen ? 1 : 0
 
                             Rectangle {
                                 anchors.fill: parent
@@ -589,7 +399,7 @@ ShellRoot {
                                         Layout.fillWidth: true
 
                                         Text {
-                                            text: "Wi-Fi"
+                                            text: "Bluetooth"
                                             color: root.fg
                                             font.family: root.fontFamily
                                             font.pixelSize: 13
@@ -598,21 +408,8 @@ ShellRoot {
                                         }
 
                                         Text {
-                                            text: "  "
-                                            color: root.muted
-                                            font.family: root.fontFamily
-                                            font.pixelSize: 15
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: network.refreshNetworkData()
-                                            }
-                                        }
-
-                                        Text {
-                                            text: network.state !== 0 ? "" : ""
-                                            color: network.state !== 0 ? root.accent : root.muted
+                                            text: bluetooth.state ? "" : ""
+                                            color: bluetooth.state ? root.accent : root.muted
                                             font.family: root.fontFamily
                                             font.pixelSize: 20
 
@@ -620,21 +417,20 @@ ShellRoot {
                                                 anchors.fill: parent
                                                 cursorShape: Qt.PointingHandCursor
                                                 onClicked: {
-                                                    if (network.state !== 0)
-                                                        Quickshell.execDetached(["nmcli", "radio", "wifi", "off"]);
+                                                    if (bluetooth.state)
+                                                        Quickshell.execDetached(["bluetoothctl", "power", "off"]);
                                                     else
-                                                        Quickshell.execDetached(["nmcli", "radio", "wifi", "on"]);
-                                                    network.refreshNetworkData();
+                                                        Quickshell.execDetached(["bluetoothctl", "power", "on"]);
                                                 }
                                             }
                                         }
                                     }
 
                                     ListView {
-                                        id: wifiListView
+                                        id: btListView
                                         Layout.fillWidth: true
                                         Layout.fillHeight: true
-                                        model: network.networks
+                                        model: bluetooth.devices || []
                                         clip: true
                                         spacing: 7
 
@@ -643,7 +439,7 @@ ShellRoot {
                                         }
 
                                         delegate: Rectangle {
-                                            width: wifiListView.width
+                                            width: btListView.width
                                             height: 32
                                             radius: 6
                                             color: root.softFill
@@ -655,52 +451,26 @@ ShellRoot {
                                                 spacing: 8
 
                                                 Text {
-                                                    text: {
-                                                        const signalVal = parseInt(modelData.signal);
-                                                        if (isNaN(signalVal))
-                                                            return "󰤯";
-                                                        if (signalVal > 80)
-                                                            return "󰤨";
-                                                        if (signalVal > 60)
-                                                            return "󰤥";
-                                                        if (signalVal > 40)
-                                                            return "󰤢";
-                                                        if (signalVal > 20)
-                                                            return "󰤟";
-                                                        return "󰤯";
-                                                    }
-                                                    color: root.fg
+                                                    text: modelData.connected ? "󰂱" : "󰂯"
+                                                    color: modelData.connected ? root.accent : root.fg
                                                     font.family: root.fontFamily
                                                     font.pixelSize: 15
                                                 }
 
                                                 Text {
-                                                    text: modelData.ssid
+                                                    text: modelData.name || modelData.mac || "Onbekend apparaat"
                                                     color: root.fg
                                                     font.family: root.fontFamily
-                                                    font.pixelSize: 15
+                                                    font.pixelSize: 13
                                                     Layout.fillWidth: true
                                                     elide: Text.ElideRight
                                                 }
 
                                                 Text {
-                                                    text: {
-                                                        if (network.connectionDetails.indexOf(modelData.ssid) !== -1 && network.state !== 0)
-                                                            return "";
-                                                        if (modelData.security && modelData.security !== "" && modelData.security !== "--")
-                                                            return "";
-                                                        return "";
-                                                    }
-                                                    color: root.muted
+                                                    text: modelData.connected ? "" : ""
+                                                    color: root.accent
                                                     font.family: root.fontFamily
-                                                    font.pixelSize: 15
-                                                }
-
-                                                Text {
-                                                    text: ""
-                                                    color: root.muted
-                                                    font.family: root.fontFamily
-                                                    font.pixelSize: 20
+                                                    font.pixelSize: 13
                                                 }
                                             }
 
@@ -708,7 +478,10 @@ ShellRoot {
                                                 anchors.fill: parent
                                                 cursorShape: Qt.PointingHandCursor
                                                 onClicked: {
-                                                    Quickshell.execDetached(["nmcli", "device", "wifi", "connect", modelData.ssid]);
+                                                    if (modelData.connected)
+                                                        Quickshell.execDetached(["bluetoothctl", "disconnect", modelData.mac]);
+                                                    else
+                                                        Quickshell.execDetached(["bluetoothctl", "connect", modelData.mac]);
                                                 }
                                             }
                                         }
@@ -726,14 +499,14 @@ ShellRoot {
 
             Behavior on width {
                 NumberAnimation {
-                    duration: 1 // Ook rechts verhoogd naar 150ms voor een mooie vloeiende animatie
+                    duration: 1
                     easing.type: Easing.Linear
                 }
             }
         }
     }
 
-    // ---- HERBRUIKBARE NOTCH COMPONENT (ZONDER BOVENRAND) ----
+    // ---- HERBRUIKBARE NOTCH COMPONENT ----
     component NotchBackground: Shape {
         id: shapeBg
         antialiasing: true
@@ -751,13 +524,9 @@ ShellRoot {
             strokeColor: '#2cffffff'
             strokeWidth: 2
 
-            // Begin rechtsboven i.p.v. linksboven
             startX: shapeBg.width
             startY: 0
 
-            // De PathLine die hier de bovenrand trok is nu volledig weggehaald!
-
-            // Rechter concave overgangshoek
             PathQuad {
                 x: shapeBg.width - shapeBg.actualNd
                 y: shapeBg.actualNd
@@ -765,13 +534,11 @@ ShellRoot {
                 controlY: 0
             }
 
-            // Rechter verticale wand
             PathLine {
                 x: shapeBg.width - shapeBg.actualNd
                 y: shapeBg.height - shapeBg.actualCr
             }
 
-            // Rechtsonder convexe hoek
             PathArc {
                 x: shapeBg.width - shapeBg.actualNd - shapeBg.actualCr
                 y: shapeBg.height
@@ -781,13 +548,11 @@ ShellRoot {
                 direction: PathArc.Clockwise
             }
 
-            // Onderkant strak naar links
             PathLine {
                 x: shapeBg.actualNd + shapeBg.actualCr
                 y: shapeBg.height
             }
 
-            // Linksonder convexe hoek
             PathArc {
                 x: shapeBg.actualNd
                 y: shapeBg.height - shapeBg.actualCr
@@ -797,55 +562,17 @@ ShellRoot {
                 direction: PathArc.Clockwise
             }
 
-            // Linker verticale wand omhoog
             PathLine {
                 x: shapeBg.actualNd
                 y: shapeBg.actualNd
             }
 
-            // Linkerboven concave overgangshoek (eindigt op x:0, y:0)
             PathQuad {
                 x: 0
                 y: 0
                 controlX: shapeBg.actualNd
                 controlY: 0
             }
-
-            // De opvulling sluit zichzelf automatisch van (0,0) terug naar (width,0)
-            // zonder daar een stroke/omlijning te tekenen!
-        }
-    }
-
-    // ---- HERBRUIKBARE KNOPSJABLOON ----
-    component MusicButton: Rectangle {
-        id: btn
-
-        property string glyph: ""
-        property bool big: false
-
-        signal pressed
-
-        Layout.preferredWidth: big ? 30 : 22
-        Layout.preferredHeight: big ? 30 : 22
-        radius: width / 2
-        color: enabled ? "#3b2e2e3d" : "#3b2e2e3d"
-        border.color: enabled ? root.borderCol : "#3b2e2e3d"
-        border.width: 1
-        opacity: enabled ? 1 : 0.45
-
-        Text {
-            anchors.centerIn: parent
-            text: btn.glyph
-            color: root.fg
-            font.family: root.fontFamily
-            font.pixelSize: btn.big ? 14 : 11
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: btn.enabled
-            cursorShape: Qt.PointingHandCursor
-            onClicked: btn.pressed()
         }
     }
 }
