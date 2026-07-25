@@ -1,34 +1,35 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
+import Quickshell
+import Quickshell.Hyprland
 
 RowLayout {
     id: launcherRoot
     spacing: 4
 
-    // Hier voeg je eenvoudig nieuwe apps toe
     property var apps: [
         {
-            icon: "image://icon/zen-browser",
+            icon: "zen-browser",
             fallback: "file:///usr/share/icons/hicolor/scalable/apps/zen-browser.svg",
-            exec: "zen-browser.desktop"
+            exec: "zen-browser" // Binary in plaats van .desktop
         },
         {
-            icon: "image://icon/discord",
+            icon: "discord",
             fallback: "file:///usr/share/icons/hicolor/scalable/apps/discord.svg",
             exec: "discord"
         },
         {
-            icon: "image://icon/spotify",
+            icon: "spotify",
             fallback: "file:///usr/share/icons/hicolor/scalable/apps/spotify.svg",
             exec: "spotify"
         },
         {
-            icon: "image://icon/zed",
+            icon: "zed",
             fallback: "file:///usr/share/icons/hicolor/scalable/apps/zed.svg",
-            exec: "zed"
+            exec: "zeditor"
         },
         {
-            icon: "image://icon/org.gnome.Nautilus",
+            icon: "org.gnome.Nautilus",
             fallback: "",
             exec: "nautilus"
         }
@@ -53,9 +54,19 @@ RowLayout {
             Image {
                 id: appIcon
                 anchors.fill: parent
-                anchors.margins: 5
+                anchors.margins: 3
                 fillMode: Image.PreserveAspectFit
-                source: modelData.icon
+
+                // Dwing Qt om het icoon op hoge resolutie te renderen
+                sourceSize: Qt.size(64, 64)
+                smooth: true
+                mipmap: true
+
+                // Zoek het pad op via Quickshell's native icon resolver, anders fallback
+                source: {
+                    let path = Quickshell.iconPath(modelData.icon);
+                    return path !== "" ? path : "image://icon/" + modelData.icon;
+                }
 
                 onStatusChanged: {
                     if (status === Image.Error && modelData.fallback && modelData.fallback !== "") {
@@ -70,8 +81,8 @@ RowLayout {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    // Start via Hyprland dispatch (werkt altijd in Hyprland)
-                    Hyprland.dispatch("exec " + modelData.exec);
+                    // Betrouwbare detach execution via shell
+                    Quickshell.execDetached(["sh", "-c", modelData.exec]);
                 }
             }
         }
