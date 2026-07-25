@@ -160,3 +160,4 @@ done
         cursorShape: Qt.PointingHandCursor
         onClicked: root.open = !root.open
     }
+}
