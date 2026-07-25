@@ -11,7 +11,6 @@ RowLayout {
     readonly property color accent: "#ebd9b9"
     readonly property string fontFamily: "JetBrainsMono Nerd Font Mono"
 
-    // spacing: 3
     implicitHeight: 18
 
     // Monitor schermhelderheid via brightnessctl
@@ -44,17 +43,13 @@ RowLayout {
         font.pixelSize: 19
     }
 
-    Text {
-        text: root.brightnessPct + "%"
-        color: root.fg
-        font.family: root.fontFamily
-        font.pixelSize: 14
-        font.bold: true
-    }
-
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
+
+        // Zorgt ervoor dat zowel links als rechts worden geregistreerd
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
         onWheel: wheel => {
             if (wheel.angleDelta.y > 0) {
                 Quickshell.execDetached(["brightnessctl", "set", "+5%"]);
@@ -64,10 +59,17 @@ RowLayout {
                 root.brightnessPct = Math.max(1, root.brightnessPct - 5);
             }
         }
-        onClicked: {
-            // Snel schakelen tussen 30% en 100% bij klikken
-            let target = root.brightnessPct > 50 ? "30%" : "100%";
-            Quickshell.execDetached(["brightnessctl", "set", target]);
+
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton) {
+                // Rechtermuisklik: Schakel Night Shift in/uit
+                // Pas dit commando aan naar jouw specifieke night shift tool!
+                Quickshell.execDetached(["omarchy-toggle-nightlight"]);
+            } else if (mouse.button === Qt.LeftButton) {
+                // Linkermuisklik: Snel schakelen tussen 30% en 100%
+                let target = root.brightnessPct > 50 ? "30%" : "100%";
+                Quickshell.execDetached(["brightnessctl", "set", target]);
+            }
         }
     }
 }
