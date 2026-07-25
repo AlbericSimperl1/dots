@@ -35,6 +35,7 @@ ShellRoot {
     readonly property int expandedWidthL: 480
     readonly property int expandedWidthR: 445
     readonly property int musicExpandedHeight: 250
+    readonly property int bluetoothExpandedHeight: 200
     readonly property int networkExpandedHeight: 200
     readonly property int notchDepth: 5
     readonly property int cornerRadius: 11
@@ -152,7 +153,8 @@ ShellRoot {
             property bool rightHovered: false
             property bool musicOpen: false
             property bool networkOpen: false
-            property bool rightExpanded: rightHovered || musicOpen || networkOpen
+            property bool bluetoothOpen: false
+            property bool rightExpanded: rightHovered || musicOpen || networkOpen || bluetoothOpen
 
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
@@ -164,6 +166,8 @@ ShellRoot {
                     return root.musicExpandedHeight;
                 if (networkOpen)
                     return root.networkExpandedHeight;
+                if (bluetoothOpen)
+                    return root.bluetoothExpandedHeight;
                 if (rightExpanded)
                     return root.barHeightR;
                 return 12;
@@ -179,6 +183,11 @@ ShellRoot {
                     networkCloseTimer.start();
                 else if (rightHovered)
                     networkCloseTimer.stop();
+
+                if (!rightHovered && bluetoothOpen) // <-- TOEGEVOEGD
+                    bluetoothCloseTimer.start();
+                else if (rightHovered)
+                    bluetoothCloseTimer.stop();
             }
             onMusicOpenChanged: {
                 music.open = musicOpen;
@@ -192,6 +201,14 @@ ShellRoot {
                 if (networkOpen) {
                     networkCloseTimer.stop();
                     music.open = false;
+                }
+            }
+            onBluetoothOpenChanged: { // <-- TOEGEVOEGD: exclusieve status
+                bluetooth.open = bluetoothOpen;
+                if (bluetoothOpen) {
+                    bluetoothCloseTimer.stop();
+                    music.open = false;
+                    network.open = false;
                 }
             }
 
@@ -219,6 +236,15 @@ ShellRoot {
                         rightPanel.networkOpen = false;
                 }
             }
+            Timer { // <-- TOEGEVOEGD
+                id: bluetoothCloseTimer
+                interval: 30
+                repeat: false
+                onTriggered: {
+                    if (!rightPanel.rightHovered && rightPanel.bluetoothOpen)
+                        rightPanel.bluetoothOpen = false;
+                }
+            }
 
             Item {
                 anchors.fill: parent
@@ -238,6 +264,8 @@ ShellRoot {
                             return root.musicExpandedHeight;
                         if (rightPanel.networkOpen)
                             return root.networkExpandedHeight;
+                        if (rightPanel.bluetoothOpen) // <-- TOEGEVOEGD
+                            return root.bluetoothExpandedHeight;
                         if (rightPanel.rightExpanded)
                             return root.barHeightR;
                         return root.collapsedHeight;
@@ -287,6 +315,19 @@ ShellRoot {
                                 }
                             }
 
+                            Bluetooth {
+                                id: bluetooth
+                                fg: root.fg
+                                accent: root.accent
+                                muted: root.muted
+                                softFill: root.softFill
+                                borderCol: root.borderCol
+                                fontFamily: root.fontFamily
+                                onOpenChanged: {
+                                    rightPanel.bluetoothOpen = open;
+                                }
+                            }
+
                             Network {
                                 id: network
                                 fg: root.fg
@@ -314,6 +355,19 @@ ShellRoot {
                             Layout.fillHeight: true
                             visible: rightPanel.musicOpen
                             music: music
+                            fg: root.fg
+                            accent: root.accent
+                            muted: root.muted
+                            softFill: root.softFill
+                            borderCol: root.borderCol
+                            fontFamily: root.fontFamily
+                        }
+
+                        BluetoothDropdown {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            visible: rightPanel.bluetoothOpen
+                            bluetooth: bluetooth
                             fg: root.fg
                             accent: root.accent
                             muted: root.muted
