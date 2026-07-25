@@ -148,7 +148,7 @@ ShellRoot {
         // ================= GESPLITSTE RECHTER NOTCH =================
         PanelWindow {
             id: rightPanel
-
+            focusable: true
             required property var modelData
             property bool rightHovered: false
             property bool musicOpen: false
