@@ -11,9 +11,13 @@ RowLayout {
     property int persistentCount: 6
 
     property var icons: ({
-        "1": "", "2": "", "3": "",
-        "4": "", "5": "", "6": ""
-    })
+            "1": "",
+            "2": "",
+            "3": "",
+            "4": "",
+            "5": "",
+            "6": ""
+        })
 
     Repeater {
         model: persistentCount
@@ -24,22 +28,29 @@ RowLayout {
             property bool isActive: Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === wsId
             property bool isEmpty: {
                 for (const ws of Hyprland.workspaces.values) {
-                    if (ws.id === wsId) return false;
+                    if (ws.id === wsId)
+                        return false;
                 }
                 return true;
             }
             property bool hovered: false
 
-            Layout.preferredHeight: 5
+            Layout.preferredHeight: 6
             Layout.preferredWidth: isActive ? 65 : (isEmpty ? 20 : 40)
             Layout.alignment: Qt.AlignVCenter
             radius: 100
-            color: isActive
-                ? "#fff7e5"
-                : (hovered ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(1, 1, 1, 0.25))
+            color: isActive ? "#fff7e5" : (hovered ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(1, 1, 1, 0.25))
 
-            Behavior on Layout.preferredWidth { NumberAnimation { duration: 1 } }
-            Behavior on color { ColorAnimation { duration: 100 } }
+            Behavior on Layout.preferredWidth {
+                NumberAnimation {
+                    duration: 1
+                }
+            }
+            Behavior on color {
+                ColorAnimation {
+                    duration: 100
+                }
+            }
 
             MouseArea {
                 anchors.fill: parent

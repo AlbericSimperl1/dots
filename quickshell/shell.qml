@@ -126,10 +126,11 @@ ShellRoot {
                         anchors.leftMargin: root.notchDepth + 10
                         // OPMERKING: anchors.right is hier verwijderd om samendrukken te voorkomen!
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: 2
+                        spacing: 10
 
                         Workspaces {}
-                        ClockModule {}
+                        AppLauncher {}
+                        // ClockModule {}
                     }
                 }
             }
