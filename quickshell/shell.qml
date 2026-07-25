@@ -32,7 +32,7 @@ ShellRoot {
     readonly property int collapsedHeight: 4
 
     readonly property int collapsedWidth: 130
-    readonly property int expandedWidthL: 4800
+    readonly property int expandedWidthL: 480
     readonly property int expandedWidthR: 445
     readonly property int musicExpandedHeight: 250
     readonly property int networkExpandedHeight: 200
