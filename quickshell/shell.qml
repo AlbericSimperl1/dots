@@ -36,7 +36,6 @@ ShellRoot {
     readonly property int expandedWidthR: 445
     readonly property int musicExpandedHeight: 250
     readonly property int networkExpandedHeight: 200
-    readonly property int bluetoothExpandedHeight: 200
     readonly property int notchDepth: 5
     readonly property int cornerRadius: 11
 
@@ -153,8 +152,7 @@ ShellRoot {
             property bool rightHovered: false
             property bool musicOpen: false
             property bool networkOpen: false
-            property bool bluetoothOpen: false
-            property bool rightExpanded: rightHovered || musicOpen || networkOpen || bluetoothOpen
+            property bool rightExpanded: rightHovered || musicOpen || networkOpen
 
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
@@ -166,8 +164,6 @@ ShellRoot {
                     return root.musicExpandedHeight;
                 if (networkOpen)
                     return root.networkExpandedHeight;
-                if (bluetoothOpen)
-                    return root.bluetoothExpandedHeight;
                 if (rightExpanded)
                     return root.barHeightR;
                 return 12;
@@ -183,18 +179,12 @@ ShellRoot {
                     networkCloseTimer.start();
                 else if (rightHovered)
                     networkCloseTimer.stop();
-
-                if (!rightHovered && bluetoothOpen)
-                    bluetoothCloseTimer.start();
-                else if (rightHovered)
-                    bluetoothCloseTimer.stop();
             }
             onMusicOpenChanged: {
                 music.open = musicOpen;
                 if (musicOpen) {
                     musicCloseTimer.stop();
                     network.open = false;
-                    bluetoothOpen = false;
                 }
             }
             onNetworkOpenChanged: {
@@ -202,16 +192,6 @@ ShellRoot {
                 if (networkOpen) {
                     networkCloseTimer.stop();
                     music.open = false;
-                    bluetoothOpen = false;
-                }
-            }
-            onBluetoothOpenChanged: {
-                if (bluetooth)
-                    bluetooth.open = bluetoothOpen;
-                if (bluetoothOpen) {
-                    bluetoothCloseTimer.stop();
-                    music.open = false;
-                    network.open = false;
                 }
             }
 
@@ -240,16 +220,6 @@ ShellRoot {
                 }
             }
 
-            Timer {
-                id: bluetoothCloseTimer
-                interval: 30
-                repeat: false
-                onTriggered: {
-                    if (!rightPanel.rightHovered && rightPanel.bluetoothOpen)
-                        rightPanel.bluetoothOpen = false;
-                }
-            }
-
             Item {
                 anchors.fill: parent
 
@@ -268,8 +238,6 @@ ShellRoot {
                             return root.musicExpandedHeight;
                         if (rightPanel.networkOpen)
                             return root.networkExpandedHeight;
-                        if (rightPanel.bluetoothOpen)
-                            return root.bluetoothExpandedHeight;
                         if (rightPanel.rightExpanded)
                             return root.barHeightR;
                         return root.collapsedHeight;
@@ -332,24 +300,6 @@ ShellRoot {
                                 }
                             }
 
-                            // Network {
-                            //     id: network
-                            //     fg: root.fg
-                            //     accent: root.accent
-                            //     muted: root.muted
-                            //     softFill: root.softFill
-                            //     borderCol: root.borderCol
-                            //     fontFamily: root.fontFamily
-                            //     onOpenChanged: rightPanel.networkOpen = open
-                            // }
-
-                            // Bluetooth {
-                            //     id: bluetooth
-                            //     onOpenChanged: {
-                            //         rightPanel.bluetoothOpen = open;
-                            //     }
-                            // }
-
                             HyprStream {}
                             Cpu {}
                             Power {}
@@ -385,133 +335,6 @@ ShellRoot {
                             borderCol: root.borderCol
                             fontFamily: root.fontFamily
                         }
-
-                        // NetworkDropdown {
-                        //     Layout.fillWidth: true
-                        //     Layout.fillHeight: true
-                        //     visible: rightPanel.networkOpen
-                        //     network: network
-                        //     fg: root.fg
-                        //     accent: root.accent
-                        //     muted: root.muted
-                        //     softFill: root.softFill
-                        //     borderCol: root.borderCol
-                        //     fontFamily: root.fontFamily
-                        // }
-                        // ---- Bluetooth Dropdown ----
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            visible: rightPanel.bluetoothOpen
-                            opacity: rightPanel.bluetoothOpen ? 1 : 0
-
-                            Rectangle {
-                                anchors.fill: parent
-                                color: "transparent"
-                                clip: true
-
-                                ColumnLayout {
-                                    anchors.fill: parent
-                                    anchors.leftMargin: root.notchDepth + 5
-                                    anchors.rightMargin: root.notchDepth + 5
-                                    anchors.topMargin: 4
-                                    anchors.bottomMargin: 10
-                                    spacing: 8
-
-                                    RowLayout {
-                                        Layout.fillWidth: true
-
-                                        Text {
-                                            text: "Bluetooth"
-                                            color: root.fg
-                                            font.family: root.fontFamily
-                                            font.pixelSize: 13
-                                            font.bold: true
-                                            Layout.fillWidth: true
-                                        }
-
-                                        Text {
-                                            text: bluetooth.state ? "" : ""
-                                            color: bluetooth.state ? root.accent : root.muted
-                                            font.family: root.fontFamily
-                                            font.pixelSize: 20
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: {
-                                                    if (bluetooth.state)
-                                                        Quickshell.execDetached(["bluetoothctl", "power", "off"]);
-                                                    else
-                                                        Quickshell.execDetached(["bluetoothctl", "power", "on"]);
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    ListView {
-                                        id: btListView
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        model: bluetooth.devices || []
-                                        clip: true
-                                        spacing: 7
-
-                                        ScrollBar.vertical: ScrollBar {
-                                            policy: ScrollBar.AsNeeded
-                                        }
-
-                                        delegate: Rectangle {
-                                            width: btListView.width
-                                            height: 32
-                                            radius: 6
-                                            color: root.softFill
-
-                                            RowLayout {
-                                                anchors.fill: parent
-                                                anchors.leftMargin: 10
-                                                anchors.rightMargin: 10
-                                                spacing: 8
-
-                                                Text {
-                                                    text: modelData.connected ? "󰂱" : "󰂯"
-                                                    color: modelData.connected ? root.accent : root.fg
-                                                    font.family: root.fontFamily
-                                                    font.pixelSize: 15
-                                                }
-
-                                                Text {
-                                                    text: modelData.name || modelData.mac || "Onbekend apparaat"
-                                                    color: root.fg
-                                                    font.family: root.fontFamily
-                                                    font.pixelSize: 13
-                                                    Layout.fillWidth: true
-                                                    elide: Text.ElideRight
-                                                }
-
-                                                Text {
-                                                    text: modelData.connected ? "" : ""
-                                                    color: root.accent
-                                                    font.family: root.fontFamily
-                                                    font.pixelSize: 13
-                                                }
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: {
-                                                    if (modelData.connected)
-                                                        Quickshell.execDetached(["bluetoothctl", "disconnect", modelData.mac]);
-                                                    else
-                                                        Quickshell.execDetached(["bluetoothctl", "connect", modelData.mac]);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -537,7 +360,7 @@ ShellRoot {
         property color fillColor: '#ff000000'
         readonly property real actualNd: Math.min(root.notchDepth, shapeBg.height * 0.5)
         readonly property real actualCr: Math.min(root.cornerRadius, shapeBg.height - actualNd)
-        property bool expanded: rightHovered || musicOpen || networkOpen || bluetoothOpen || leftHovered
+        property bool expanded: rightHovered || musicOpen || networkOpen || leftHovered
 
         layer.enabled: true
         layer.samples: 8
