@@ -319,19 +319,6 @@ ShellRoot {
                                 }
                             }
 
-                            // Network {
-                            //     id: network
-                            //     fg: root.fg
-                            //     accent: root.accent
-                            //     muted: root.muted
-                            //     softFill: root.softFill
-                            //     borderCol: root.borderCol
-                            //     fontFamily: root.fontFamily
-                            //     onOpenChanged: {
-                            //         rightPanel.networkOpen = open;
-                            //     }
-                            // }
-
                             Network {
                                 id: network
                                 fg: root.fg
@@ -340,8 +327,21 @@ ShellRoot {
                                 softFill: root.softFill
                                 borderCol: root.borderCol
                                 fontFamily: root.fontFamily
-                                onOpenChanged: rightPanel.networkOpen = open
+                                onOpenChanged: {
+                                    rightPanel.networkOpen = open;
+                                }
                             }
+
+                            // Network {
+                            //     id: network
+                            //     fg: root.fg
+                            //     accent: root.accent
+                            //     muted: root.muted
+                            //     softFill: root.softFill
+                            //     borderCol: root.borderCol
+                            //     fontFamily: root.fontFamily
+                            //     onOpenChanged: rightPanel.networkOpen = open
+                            // }
 
                             // Bluetooth {
                             //     id: bluetooth
@@ -373,19 +373,6 @@ ShellRoot {
                         }
 
                         // ---- Netwerkinformatie Dropdown ----
-                        // NetworkDropdown {
-                        //     Layout.fillWidth: true
-                        //     Layout.fillHeight: true
-                        //     visible: rightPanel.networkOpen
-                        //     network: network
-                        //     fg: root.fg
-                        //     accent: root.accent
-                        //     muted: root.muted
-                        //     softFill: root.softFill
-                        //     borderCol: root.borderCol
-                        //     fontFamily: root.fontFamily
-                        // }
-
                         NetworkDropdown {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
@@ -398,6 +385,19 @@ ShellRoot {
                             borderCol: root.borderCol
                             fontFamily: root.fontFamily
                         }
+
+                        // NetworkDropdown {
+                        //     Layout.fillWidth: true
+                        //     Layout.fillHeight: true
+                        //     visible: rightPanel.networkOpen
+                        //     network: network
+                        //     fg: root.fg
+                        //     accent: root.accent
+                        //     muted: root.muted
+                        //     softFill: root.softFill
+                        //     borderCol: root.borderCol
+                        //     fontFamily: root.fontFamily
+                        // }
                         // ---- Bluetooth Dropdown ----
                         Item {
                             Layout.fillWidth: true
