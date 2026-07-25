@@ -5,7 +5,7 @@ import Quickshell.Hyprland
 
 RowLayout {
     id: launcherRoot
-    spacing: 4
+    spacing: 10
 
     property var apps: [
         {

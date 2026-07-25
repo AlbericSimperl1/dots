@@ -33,10 +33,10 @@ ShellRoot {
 
     readonly property int collapsedWidth: 130
     readonly property int expandedWidthL: 480
-    readonly property int expandedWidthR: 445
+    readonly property int expandedWidthR: 450
     readonly property int musicExpandedHeight: 250
-    readonly property int bluetoothExpandedHeight: 200
-    readonly property int networkExpandedHeight: 200
+    readonly property int bluetoothExpandedHeight: 250
+    readonly property int networkExpandedHeight: 250
     readonly property int notchDepth: 5
     readonly property int cornerRadius: 11
 
@@ -155,6 +155,7 @@ ShellRoot {
             property bool networkOpen: false
             property bool bluetoothOpen: false
             property bool rightExpanded: rightHovered || musicOpen || networkOpen || bluetoothOpen
+            readonly property int hPadding: (root.notchDepth + 17) + (root.notchDepth + 10)
 
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
@@ -291,7 +292,7 @@ ShellRoot {
                     ColumnLayout {
                         anchors.fill: parent
                         anchors.top: parent.top
-                        anchors.leftMargin: root.notchDepth + 17
+                        anchors.leftMargin: root.notchDepth + 10
                         anchors.rightMargin: root.notchDepth + 10
                         spacing: 1
 
@@ -299,54 +300,82 @@ ShellRoot {
                             id: systemRow
                             Layout.fillWidth: true
                             Layout.preferredHeight: root.barHeight
-                            spacing: 15
+                            Layout.alignment: Qt.AlignVCenter
+                            spacing: 0
 
-                            MusicModule {
-                                id: music
-                                screen: rightPanel.modelData
-                                fg: root.fg
-                                accent: root.accent
-                                muted: root.muted
-                                softFill: root.softFill
-                                borderCol: root.borderCol
-                                fontFamily: root.fontFamily
-                                onOpenChanged: {
-                                    rightPanel.musicOpen = open;
+                            ModuleItem {
+                                MusicModule {
+                                    id: music
+                                    screen: rightPanel.modelData
+                                    fg: root.fg
+                                    accent: root.accent
+                                    muted: root.muted
+                                    softFill: "transparent" // Zet interne softFill op transparant om rode vlakken te vermijden
+                                    borderCol: root.borderCol
+                                    fontFamily: root.fontFamily
+                                    onOpenChanged: {
+                                        if (open) {
+                                            network.open = false;
+                                            bluetooth.open = false;
+                                        }
+                                    }
                                 }
                             }
 
-                            Bluetooth {
-                                id: bluetooth
-                                fg: root.fg
-                                accent: root.accent
-                                muted: root.muted
-                                softFill: root.softFill
-                                borderCol: root.borderCol
-                                fontFamily: root.fontFamily
-                                onOpenChanged: {
-                                    rightPanel.bluetoothOpen = open;
+                            ModuleItem {
+                                Network {
+                                    id: network
+                                    fg: root.fg
+                                    accent: root.accent
+                                    muted: root.muted
+                                    softFill: "transparent"
+                                    borderCol: root.borderCol
+                                    fontFamily: root.fontFamily
+                                    onOpenChanged: {
+                                        if (open) {
+                                            music.open = false;
+                                            bluetooth.open = false;
+                                        }
+                                    }
                                 }
                             }
 
-                            Network {
-                                id: network
-                                fg: root.fg
-                                accent: root.accent
-                                muted: root.muted
-                                softFill: root.softFill
-                                borderCol: root.borderCol
-                                fontFamily: root.fontFamily
-                                onOpenChanged: {
-                                    rightPanel.networkOpen = open;
+                            ModuleItem {
+                                Bluetooth {
+                                    id: bluetooth
+                                    fg: root.fg
+                                    accent: root.accent
+                                    muted: root.muted
+                                    softFill: "transparent"
+                                    borderCol: root.borderCol
+                                    fontFamily: root.fontFamily
+                                    onOpenChanged: {
+                                        if (open) {
+                                            music.open = false;
+                                            network.open = false;
+                                        }
+                                    }
                                 }
                             }
 
-                            HyprStream {}
-                            Cpu {}
-                            Power {}
-                            Brightness {}
-                            Battery {}
-                            DateModule {}
+                            ModuleItem {
+                                HyprStream {}
+                            }
+                            ModuleItem {
+                                Cpu {}
+                            }
+                            ModuleItem {
+                                Power {}
+                            }
+                            ModuleItem {
+                                Brightness {}
+                            }
+                            ModuleItem {
+                                Battery {}
+                            }
+                            ModuleItem {
+                                DateModule {}
+                            }
                         }
 
                         // ---- Muziekbediening Dropdown ----
@@ -403,6 +432,41 @@ ShellRoot {
                     easing.type: Easing.Linear
                 }
             }
+        }
+    }
+
+    // ---- HERBRUIKBARE HOVER PILL COMPONENT ----
+    component HoverPill: Rectangle {
+        id: buttonBg
+        default property alias content: container.children
+
+        // Schaalt netjes mee met de hoogte van de bar
+        Layout.fillHeight: true
+        Layout.topMargin: 4
+        Layout.bottomMargin: 4
+        implicitWidth: container.implicitWidth + 5
+
+        // Jouw exacte styling & kleur
+        radius: 8
+        color: hoverHandler.hovered ? Qt.rgba(1, 0, 0, 0.85) : "transparent"
+
+        Behavior on color {
+            ColorAnimation {
+                duration: 150
+            }
+        }
+
+        // HoverHandler werkt precies zoals containsMouse, maar laat muiskliks
+        // van geopende dropdowns (Bluetooth/Network) gewoon door.
+        HoverHandler {
+            id: hoverHandler
+            cursorShape: Qt.PointingHandCursor
+        }
+
+        RowLayout {
+            id: container
+            anchors.centerIn: parent
+            spacing: 0
         }
     }
 

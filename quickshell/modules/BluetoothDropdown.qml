@@ -35,7 +35,7 @@ Item {
             text: btn.glyph
             color: btn.active ? "#111117" : dropdownRoot.fg
             font.family: dropdownRoot.fontFamily
-            font.pixelSize: 13
+            font.pixelSize: 15
         }
 
         MouseArea {
@@ -89,7 +89,7 @@ Item {
                             }
                             color: dropdownRoot.fg
                             font.family: dropdownRoot.fontFamily
-                            font.pixelSize: 13
+                            font.pixelSize: 16
                             font.bold: true
                             Layout.fillWidth: true
                             elide: Text.ElideRight
@@ -107,7 +107,7 @@ Item {
                         }
                         color: dropdownRoot.muted
                         font.family: dropdownRoot.fontFamily
-                        font.pixelSize: 10
+                        font.pixelSize: 12
                         elide: Text.ElideRight
                     }
                 }
@@ -172,14 +172,14 @@ Item {
                             text: dropdownRoot.bluetooth ? dropdownRoot.bluetooth.getDeviceIcon(modelData.name) : "󰂱"
                             color: modelData.connected ? dropdownRoot.accent : dropdownRoot.fg
                             font.family: dropdownRoot.fontFamily
-                            font.pixelSize: 13
+                            font.pixelSize: 16
                         }
 
                         Text {
                             text: modelData.name
                             color: dropdownRoot.fg
                             font.family: dropdownRoot.fontFamily
-                            font.pixelSize: 12
+                            font.pixelSize: 15
                             font.bold: modelData.connected
                             Layout.fillWidth: true
                             elide: Text.ElideRight
@@ -190,7 +190,7 @@ Item {
                             text: "󰌹"
                             color: dropdownRoot.muted
                             font.family: dropdownRoot.fontFamily
-                            font.pixelSize: 11
+                            font.pixelSize: 13
                         }
 
                         Text {
@@ -198,7 +198,7 @@ Item {
                             text: modelData.battery + "%"
                             color: dropdownRoot.muted
                             font.family: dropdownRoot.fontFamily
-                            font.pixelSize: 10
+                            font.pixelSize: 12
                         }
                     }
 
@@ -228,7 +228,7 @@ Item {
                         }
                         color: dropdownRoot.muted
                         font.family: dropdownRoot.fontFamily
-                        font.pixelSize: 12
+                        font.pixelSize: 14
                     }
                 }
             }

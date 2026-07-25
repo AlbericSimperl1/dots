@@ -81,7 +81,7 @@ Item {
         color: root.open ? root.accent : (root.connected ? root.fg : root.muted)
         text: root.getBtIcon(root.connected, root.btEnabled)
         font.family: root.fontFamily
-        font.pixelSize: 17
+        font.pixelSize: 19
         font.bold: true
 
         Behavior on color {

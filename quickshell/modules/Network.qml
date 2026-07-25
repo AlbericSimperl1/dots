@@ -90,7 +90,7 @@ Item {
             return root.getWifiIcon(root.signalStrength, root.connected, root.wifiEnabled);
         }
         font.family: root.fontFamily
-        font.pixelSize: 17
+        font.pixelSize: 20
         font.bold: true
 
         Behavior on color {
