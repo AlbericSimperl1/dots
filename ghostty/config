@@ -35,7 +35,7 @@ keybind = super+control+shift+alt+arrow_left=resize_split:left,100
 keybind = super+control+shift+alt+arrow_right=resize_split:right,100
 
 # Slowdown mouse scrolling
-mouse-scroll-multiplier = 0.95
+mouse-scroll-multiplier = 1.5
 
 # Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
 async-backend = epoll
@@ -43,4 +43,4 @@ async-backend = epoll
 custom-shader = ~/.config/ghostty/shaders/shader.glsl
 custom-shader-animation = true
 
-background-opacity = 0.77
+background-opacity = 1
