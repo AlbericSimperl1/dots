@@ -15,7 +15,9 @@ ShellRoot {
     id: root
 
     // ---- Kleuren & afmetingen ----
-    readonly property color barBg: '#6b575757'
+    readonly property color barBg: '#ff000000'
+
+    // readonly property color barBg: '#6b575757'
     readonly property color fg: '#fff7e5'
     readonly property color accent: '#ebd9b9'
     readonly property color inactivePill: "#a7323232"
@@ -29,7 +31,7 @@ ShellRoot {
     readonly property int barHeightL: 24
     readonly property int barHeightR: 26
     readonly property int dockHeight: 70
-    readonly property int collapsedHeight: 4
+    readonly property int collapsedHeight: 1
 
     readonly property int collapsedWidth: 130
     readonly property int expandedWidthL: 480
@@ -131,13 +133,7 @@ ShellRoot {
             }
 
             BackgroundEffect.blurRegion: Region {
-                item: leftNotchBg.width
-                //     Qt.rect {
-                //         x: 0
-                //         y: 0
-                //         width: expandedWidthL
-                //         height: leftNotchBg.height
-                //     }
+                item: leftNotchBg
             }
 
             Behavior on width {
