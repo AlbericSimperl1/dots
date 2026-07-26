@@ -46,6 +46,7 @@ ShellRoot {
         // ================= GESPLITSTE LINKER NOTCH =================
         PanelWindow {
             id: leftPanel
+            // screen: Quickshell.screens[0]
 
             required property var modelData
             property bool leftHovered: false
@@ -102,7 +103,7 @@ ShellRoot {
 
                     Behavior on height {
                         NumberAnimation {
-                            duration: 2
+                            duration: 40
                             easing.type: Easing.Linear
                         }
                     }
@@ -130,7 +131,13 @@ ShellRoot {
             }
 
             BackgroundEffect.blurRegion: Region {
-                item: leftNotchBg
+                item: leftNotchBg.width
+                //     Qt.rect {
+                //         x: 0
+                //         y: 0
+                //         width: expandedWidthL
+                //         height: leftNotchBg.height
+                //     }
             }
 
             Behavior on width {
@@ -148,6 +155,7 @@ ShellRoot {
         // ================= GESPLITSTE RECHTER NOTCH =================
         PanelWindow {
             id: rightPanel
+            // screen: Quickshell.screens[0]
             focusable: true
             required property var modelData
             property bool rightHovered: false
@@ -159,9 +167,19 @@ ShellRoot {
 
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
             color: "transparent"
             margins.right: 20
+            mask: Region {
+                item: rightNotchBg
+            }
             width: root.expandedWidthR
+
+            BackgroundEffect.blurRegion: Region {
+                id: rightBlur
+                item: rightNotchBg
+            }
+
             height: {
                 if (musicOpen)
                     return root.musicExpandedHeight;
@@ -272,10 +290,12 @@ ShellRoot {
                         return root.collapsedHeight;
                     }
                     fillColor: rightPanel.rightExpanded ? root.barBg : root.inactivePill
+                    onWidthChanged: rightBlur.changed()
+                    onHeightChanged: rightBlur.changed()
 
                     Behavior on height {
                         NumberAnimation {
-                            duration: 1
+                            duration: 40
                             easing.type: Easing.Linear
                         }
                     }
@@ -314,6 +334,7 @@ ShellRoot {
                                     borderCol: root.borderCol
                                     fontFamily: root.fontFamily
                                     onOpenChanged: {
+                                        rightPanel.musicOpen = open;
                                         if (open) {
                                             network.open = false;
                                             bluetooth.open = false;
@@ -332,6 +353,7 @@ ShellRoot {
                                     borderCol: root.borderCol
                                     fontFamily: root.fontFamily
                                     onOpenChanged: {
+                                        rightPanel.networkOpen = open;
                                         if (open) {
                                             music.open = false;
                                             bluetooth.open = false;
@@ -350,6 +372,7 @@ ShellRoot {
                                     borderCol: root.borderCol
                                     fontFamily: root.fontFamily
                                     onOpenChanged: {
+                                        rightPanel.bluetoothOpen = open;
                                         if (open) {
                                             music.open = false;
                                             network.open = false;
@@ -422,9 +445,9 @@ ShellRoot {
                 }
             }
 
-            BackgroundEffect.blurRegion: Region {
-                item: rightNotchBg
-            }
+            // BackgroundEffect.blurRegion: Region {
+            //     item: rightNotchBg
+            // }
 
             Behavior on width {
                 NumberAnimation {
@@ -480,7 +503,7 @@ ShellRoot {
         readonly property real actualCr: Math.min(root.cornerRadius, shapeBg.height - actualNd)
         property bool expanded: rightHovered || musicOpen || networkOpen || leftHovered
 
-        layer.enabled: true
+        layer.enabled: false
         layer.samples: 8
 
         ShapePath {

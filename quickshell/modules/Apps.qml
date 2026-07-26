@@ -14,9 +14,9 @@ RowLayout {
             exec: "zen-browser" // Binary in plaats van .desktop
         },
         {
-            icon: "discord",
-            fallback: "file:///usr/share/icons/hicolor/scalable/apps/discord.svg",
-            exec: "discord"
+            icon: "zed",
+            fallback: "file:///usr/share/icons/hicolor/scalable/apps/zed.svg",
+            exec: "zeditor"
         },
         {
             icon: "spotify",
@@ -24,9 +24,9 @@ RowLayout {
             exec: "spotify"
         },
         {
-            icon: "zed",
-            fallback: "file:///usr/share/icons/hicolor/scalable/apps/zed.svg",
-            exec: "zeditor"
+            icon: "discord",
+            fallback: "file:///usr/share/icons/hicolor/scalable/apps/discord.svg",
+            exec: "discord"
         },
         {
             icon: "org.gnome.Nautilus",
