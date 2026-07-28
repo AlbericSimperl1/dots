@@ -100,7 +100,7 @@
   "agent": {
     "default_model": {
       "provider": "NVIDIA NIM",
-      "model": "z-ai/glm-5.2",
+      "model": "deepseek-ai/deepseek-v4-pro",
       "enable_thinking": false,
     },
     "dock": "right",
