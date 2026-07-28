@@ -9,11 +9,11 @@ RowLayout {
     property bool open: false
     property bool isRunning: false
 
-    spacing: 6
+    spacing: 0
 
     // --- Bar Visuals ---
     Text {
-        text: root.isRunning ? "󰹞" : "󰹟" // iPad / Tablet Nerd Font icon
+        text: root.isRunning ? "" : "" // iPad / Tablet Nerd Font icon
         color: root.isRunning ? "#ff0000" : "#fff7e5"
         font.family: "JetBrainsMono Nerd Font Mono"
         font.pixelSize: 21
