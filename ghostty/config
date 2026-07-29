@@ -43,4 +43,4 @@ async-backend = epoll
 custom-shader = ~/.config/ghostty/shaders/shader.glsl
 custom-shader-animation = true
 
-background-opacity = 1
+background-opacity = 0.425

@@ -27,20 +27,19 @@ ShellRoot {
 
     readonly property string fontFamily: "JetBrainsMono Nerd Font Mono"
 
-    readonly property int barHeight: 30
-    readonly property int barHeightL: 24
+    readonly property int barHeight: 20
+    readonly property int barHeightL: 26
     readonly property int barHeightR: 26
-    readonly property int dockHeight: 70
     readonly property int collapsedHeight: 1
 
     readonly property int collapsedWidth: 130
     readonly property int expandedWidthL: 480
-    readonly property int expandedWidthR: 450
+    readonly property int expandedWidthR: 440
     readonly property int musicExpandedHeight: 250
     readonly property int bluetoothExpandedHeight: 250
     readonly property int networkExpandedHeight: 250
-    readonly property int notchDepth: 5
-    readonly property int cornerRadius: 11
+    readonly property int notchDepth: 1
+    readonly property int cornerRadius: 1
 
     Variants {
         model: Quickshell.screens
@@ -58,7 +57,7 @@ ShellRoot {
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
             color: "transparent"
-            margins.left: 10
+            margins.left: -2
 
             property int contentWidth: leftLayout.implicitWidth + root.notchDepth * 2 + 20
             property int targetWidth: Math.min(root.expandedWidthL, Math.max(root.collapsedWidth, contentWidth))
@@ -128,6 +127,7 @@ ShellRoot {
 
                         Workspaces {}
                         Apps {}
+                        Clock {}
                     }
                 }
             }
@@ -165,7 +165,7 @@ ShellRoot {
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
             color: "transparent"
-            margins.right: 20
+            margins.right: -3
             mask: Region {
                 item: rightNotchBg
             }
@@ -308,8 +308,8 @@ ShellRoot {
                     ColumnLayout {
                         anchors.fill: parent
                         anchors.top: parent.top
-                        anchors.leftMargin: root.notchDepth + 10
-                        anchors.rightMargin: root.notchDepth + 10
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
                         spacing: 1
 
                         RowLayout {
@@ -466,7 +466,7 @@ ShellRoot {
         implicitWidth: container.implicitWidth + 5
 
         // Jouw exacte styling & kleur
-        radius: 8
+        radius: 1
         color: hoverHandler.hovered ? Qt.rgba(1, 0, 0, 0.85) : "transparent"
 
         Behavior on color {
@@ -505,7 +505,7 @@ ShellRoot {
         ShapePath {
             fillColor: '#8d111117'
             strokeColor: '#2cffffff'
-            strokeWidth: 2
+            strokeWidth: 3
 
             startX: shapeBg.width
             startY: 0

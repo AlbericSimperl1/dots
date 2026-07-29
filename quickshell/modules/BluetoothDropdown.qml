@@ -25,10 +25,10 @@ Item {
 
         Layout.preferredWidth: 28
         Layout.preferredHeight: 28
-        radius: 6
+        radius: 1
         color: active ? dropdownRoot.accent : dropdownRoot.softFill
         border.color: dropdownRoot.borderCol
-        border.width: 1
+        border.width: 0
 
         Text {
             anchors.centerIn: parent
@@ -135,11 +135,10 @@ Item {
             // Scheidingslijn
             Rectangle {
                 Layout.fillWidth: true
-                height: 1
-                color: dropdownRoot.borderCol
-                opacity: 0.4
+                height: 2
+                color: Color.white
+                opacity: 0.1
             }
-
             // Bluetooth Apparaten Lijst
             ListView {
                 id: btListView
@@ -157,10 +156,10 @@ Item {
                     required property var modelData
                     width: btListView.width
                     height: 30
-                    radius: 6
+                    radius: 0
                     color: modelData.connected ? Qt.rgba(dropdownRoot.accent.r, dropdownRoot.accent.g, dropdownRoot.accent.b, 0.25) : dropdownRoot.softFill
                     border.color: modelData.connected ? dropdownRoot.accent : dropdownRoot.borderCol
-                    border.width: modelData.connected ? 1 : 0
+                    border.width: modelData.connected ? 0 : 0
 
                     RowLayout {
                         anchors.fill: parent
