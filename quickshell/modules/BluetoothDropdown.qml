@@ -16,6 +16,10 @@ Item {
 
     opacity: visible ? 1 : 0
 
+    // Gefilterde apparatenlijsten (Omarchy-stijl)
+    readonly property var connectedDevices: (bluetooth && bluetooth.btEnabled && bluetooth.devices) ? bluetooth.devices.filter(d => d.connected) : []
+    readonly property var availableDevices: (bluetooth && bluetooth.btEnabled && bluetooth.devices) ? bluetooth.devices.filter(d => !d.connected) : []
+
     // Herbruikbare knop
     component BtButton: Rectangle {
         id: btn
@@ -28,7 +32,7 @@ Item {
         radius: 1
         color: active ? dropdownRoot.accent : dropdownRoot.softFill
         border.color: dropdownRoot.borderCol
-        border.width: 0
+        border.width: 1
 
         Text {
             anchors.centerIn: parent
@@ -42,6 +46,73 @@ Item {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
             onClicked: btn.pressed()
+        }
+    }
+
+    // Herbruikbaar Apparaat-item
+    component DeviceRow: Rectangle {
+        id: devRow
+        property var deviceData: null
+
+        Layout.fillWidth: true
+        implicitHeight: 32
+        radius: 1
+        color: (deviceData && deviceData.connected) ? Qt.rgba(dropdownRoot.accent.r, dropdownRoot.accent.g, dropdownRoot.accent.b, 0.25) : dropdownRoot.softFill
+        border.color: (deviceData && deviceData.connected) ? dropdownRoot.accent : dropdownRoot.borderCol
+        border.width: (deviceData && deviceData.connected) ? 0 : 0
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: 8
+            anchors.rightMargin: 8
+            spacing: 8
+
+            Text {
+                text: dropdownRoot.bluetooth && devRow.deviceData ? dropdownRoot.bluetooth.getDeviceIcon(devRow.deviceData.name) : "󰂱"
+                color: (devRow.deviceData && devRow.deviceData.connected) ? dropdownRoot.accent : dropdownRoot.fg
+                font.family: dropdownRoot.fontFamily
+                font.pixelSize: 16
+            }
+
+            Text {
+                text: devRow.deviceData ? devRow.deviceData.name : ""
+                color: dropdownRoot.fg
+                font.family: dropdownRoot.fontFamily
+                font.pixelSize: 14
+                font.bold: devRow.deviceData && devRow.deviceData.connected
+                Layout.fillWidth: true
+                elide: Text.ElideRight
+            }
+
+            Text {
+                visible: devRow.deviceData && devRow.deviceData.paired
+                text: "󰌹"
+                color: dropdownRoot.muted
+                font.family: dropdownRoot.fontFamily
+                font.pixelSize: 13
+            }
+
+            Text {
+                visible: devRow.deviceData && devRow.deviceData.battery >= 0
+                text: devRow.deviceData ? devRow.deviceData.battery + "%" : ""
+                color: dropdownRoot.muted
+                font.family: dropdownRoot.fontFamily
+                font.pixelSize: 12
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: {
+                if (!devRow.deviceData)
+                    return;
+                if (devRow.deviceData.connected) {
+                    dropdownRoot.bluetooth.disconnectDevice(devRow.deviceData.mac);
+                } else {
+                    dropdownRoot.bluetooth.connectDevice(devRow.deviceData.mac);
+                }
+            }
         }
     }
 
@@ -63,7 +134,6 @@ Item {
                 Layout.fillWidth: true
                 spacing: 10
 
-                // Linker kolom met status en Batterij/Details
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 2
@@ -73,7 +143,7 @@ Item {
                         spacing: 6
 
                         Text {
-                            text: dropdownRoot.bluetooth ? dropdownRoot.bluetooth.getBtIcon(dropdownRoot.bluetooth.connected, dropdownRoot.bluetooth.btEnabled) : "󰂲"
+                            text: dropdownRoot.bluetooth ? dropdownRoot.bluetooth.getBtIcon(dropdownRoot.bluetooth.connected, dropdownRoot.bluetooth.btEnabled) : "󰂯"
                             color: dropdownRoot.accent
                             font.family: dropdownRoot.fontFamily
                             font.pixelSize: 14
@@ -112,7 +182,7 @@ Item {
                     }
                 }
 
-                // Rechter knoppen - vast verankerd aan de rechterzijde
+                // Rechter knoppen
                 RowLayout {
                     Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                     spacing: 6
@@ -132,102 +202,108 @@ Item {
                 }
             }
 
-            // Scheidingslijn
+            // Hoofdscheidingslijn
             Rectangle {
                 Layout.fillWidth: true
                 height: 2
                 color: Color.white
-                opacity: 0.1
+                opacity: 0.17
             }
-            // Bluetooth Apparaten Lijst
-            ListView {
-                id: btListView
+
+            // Apparatenlijst met secties & scroll
+            Flickable {
+                id: flick
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                contentWidth: width
+                contentHeight: deviceColumn.implicitHeight
                 clip: true
-                spacing: 5
-                model: (dropdownRoot.bluetooth && dropdownRoot.bluetooth.btEnabled) ? dropdownRoot.bluetooth.devices : []
 
                 ScrollBar.vertical: ScrollBar {
                     policy: ScrollBar.AsNeeded
                 }
 
-                delegate: Rectangle {
-                    required property var modelData
-                    width: btListView.width
-                    height: 30
-                    radius: 0
-                    color: modelData.connected ? Qt.rgba(dropdownRoot.accent.r, dropdownRoot.accent.g, dropdownRoot.accent.b, 0.25) : dropdownRoot.softFill
-                    border.color: modelData.connected ? dropdownRoot.accent : dropdownRoot.borderCol
-                    border.width: modelData.connected ? 0 : 0
+                ColumnLayout {
+                    id: deviceColumn
+                    width: flick.width
+                    spacing: 8
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: 8
-                        spacing: 8
+                    // Geen apparaten / Bluetooth uit melding
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 50
+                        visible: !dropdownRoot.bluetooth || !dropdownRoot.bluetooth.btEnabled || (dropdownRoot.connectedDevices.length === 0 && dropdownRoot.availableDevices.length === 0)
 
                         Text {
-                            text: dropdownRoot.bluetooth ? dropdownRoot.bluetooth.getDeviceIcon(modelData.name) : "󰂱"
-                            color: modelData.connected ? dropdownRoot.accent : dropdownRoot.fg
-                            font.family: dropdownRoot.fontFamily
-                            font.pixelSize: 16
-                        }
-
-                        Text {
-                            text: modelData.name
-                            color: dropdownRoot.fg
-                            font.family: dropdownRoot.fontFamily
-                            font.pixelSize: 15
-                            font.bold: modelData.connected
-                            Layout.fillWidth: true
-                            elide: Text.ElideRight
-                        }
-
-                        Text {
-                            visible: modelData.paired
-                            text: "󰌹"
+                            anchors.centerIn: parent
+                            text: {
+                                if (!dropdownRoot.bluetooth || !dropdownRoot.bluetooth.btEnabled)
+                                    return "Bluetooth staat uit";
+                                return "Scannen naar apparaten...";
+                            }
                             color: dropdownRoot.muted
                             font.family: dropdownRoot.fontFamily
                             font.pixelSize: 13
                         }
-
-                        Text {
-                            visible: modelData.battery >= 0
-                            text: modelData.battery + "%"
-                            color: dropdownRoot.muted
-                            font.family: dropdownRoot.fontFamily
-                            font.pixelSize: 12
-                        }
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (modelData.connected) {
-                                dropdownRoot.bluetooth.disconnectDevice(modelData.mac);
-                            } else {
-                                dropdownRoot.bluetooth.connectDevice(modelData.mac);
+                    // --- SECTIE: VERBONDEN (CONNECTED) ---
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 4
+                        visible: dropdownRoot.connectedDevices.length > 0
+
+                        Text {
+                            text: "VERBONDEN"
+                            color: dropdownRoot.muted
+                            font.family: dropdownRoot.fontFamily
+                            font.pixelSize: 10
+                            font.bold: true
+                            opacity: 0.6
+                            Layout.leftMargin: 4
+                        }
+
+                        Repeater {
+                            model: dropdownRoot.connectedDevices
+                            delegate: DeviceRow {
+                                deviceData: modelData
                             }
                         }
                     }
-                }
 
-                Item {
-                    anchors.centerIn: parent
-                    visible: btListView.count === 0
+                    // Tussenscheidingslijn tussen Verbonden en Beschikbaar
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 2
+                        color: Color.white
+                        opacity: 0.17
+                        visible: dropdownRoot.connectedDevices.length > 0 && dropdownRoot.availableDevices.length > 0
+                        Layout.topMargin: 2
+                        Layout.bottomMargin: 2
+                    }
 
-                    Text {
-                        anchors.centerIn: parent
-                        text: {
-                            if (!dropdownRoot.bluetooth || !dropdownRoot.bluetooth.btEnabled)
-                                return "Bluetooth staat uit";
-                            return "Scannen naar apparaten...";
+                    // --- SECTIE: BESCHIKBAAR (AVAILABLE) ---
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 4
+                        visible: dropdownRoot.availableDevices.length > 0
+
+                        Text {
+                            text: "BESCHIKBAAR"
+                            color: dropdownRoot.muted
+                            font.family: dropdownRoot.fontFamily
+                            font.pixelSize: 10
+                            font.bold: true
+                            opacity: 0.6
+                            Layout.leftMargin: 4
                         }
-                        color: dropdownRoot.muted
-                        font.family: dropdownRoot.fontFamily
-                        font.pixelSize: 14
+
+                        Repeater {
+                            model: dropdownRoot.availableDevices
+                            delegate: DeviceRow {
+                                deviceData: modelData
+                            }
+                        }
                     }
                 }
             }
