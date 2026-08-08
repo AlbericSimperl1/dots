@@ -7,6 +7,7 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "show_edit_predictions": false,
   "languages": {
     "QML": {
       "show_edit_predictions": false,
@@ -162,16 +163,16 @@
   "theme": {
     "mode": "system",
     "light": "One Light",
-    "dark": "Kanagawa Dragon",
+    "dark": "Omazed",
   },
 
   "experimental.theme_overrides": {
     "background.appearance": "blurred",
 
-    "background": "#02040950",
+    "background": "#02040980",
     "status_bar.background": "#020409b0",
     "title_bar.background": "#020409b0",
-    "elevated_surface.background": "#42444933",
+    "elevated_surface.background": "#121419ee",
     "surface.background": "#3a393600",
     "editor.background": "#00000055",
     "editor.gutter.background": "#0c090680",

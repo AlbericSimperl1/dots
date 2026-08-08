@@ -94,7 +94,7 @@ Item {
         color: root.open ? root.accent : root.fg
         text: ""
         font.family: root.fontFamily
-        font.pixelSize: 19
+        font.pixelSize: 21
         font.bold: true
         Behavior on color {
             ColorAnimation {

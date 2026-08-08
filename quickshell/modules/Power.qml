@@ -4,7 +4,7 @@ import Quickshell
 Text {
     color: "#fff7e5"
     font.family: "JetBrainsMono Nerd Font Mono"
-    font.pixelSize: 19
+    font.pixelSize: 22
     text: "⏼"
 
     MouseArea {

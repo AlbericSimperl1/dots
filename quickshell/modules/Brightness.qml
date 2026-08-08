@@ -37,7 +37,7 @@ RowLayout {
         }
         color: root.accent
         font.family: root.fontFamily
-        font.pixelSize: 15
+        font.pixelSize: 17
 
         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
         verticalAlignment: Text.AlignVCenter

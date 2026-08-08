@@ -44,7 +44,7 @@ Item {
         spacing: 4
 
         Text {
-            text: root.batteryPercentage + "%"
+            text: ""
             color: root.fg
             font.family: root.fontFamily
             font.pixelSize: 14
@@ -55,7 +55,7 @@ Item {
         Text {
             color: root.isCharging ? root.accent : root.fg // Accentkleur bij opladen
             font.family: root.fontFamily
-            font.pixelSize: 12
+            font.pixelSize: 16
             text: {
                 const pct = root.batteryPercentage;
                 if (root.isCharging) {

@@ -15,7 +15,7 @@ Item {
     property color muted: "#ffffff"
     property color softFill: "#ffffff"
     property color borderCol: "#eb2e2e3d"
-    property string fontFamily: "JetBrainsMono Nerd Font"
+    property string fontFamily: "JetBrainsMono Nerd Font Mono"
 
     // Bluetooth status eigenschappen
     property bool connected: false

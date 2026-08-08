@@ -28,7 +28,7 @@ Item {
 
         Layout.preferredWidth: 28
         Layout.preferredHeight: 28
-        radius: 6
+        radius: 1
         color: active ? dropdownRoot.accent : dropdownRoot.softFill
         border.color: dropdownRoot.borderCol
         border.width: 1
@@ -160,7 +160,7 @@ Item {
 
                     background: Rectangle {
                         color: dropdownRoot.softFill
-                        radius: 5
+                        radius: 1
                         border.color: dropdownRoot.borderCol
                         border.width: 1
                     }
@@ -177,7 +177,7 @@ Item {
                 Rectangle {
                     Layout.preferredWidth: 60
                     Layout.preferredHeight: 28
-                    radius: 5
+                    radius: 1
                     color: dropdownRoot.accent
 
                     Text {
@@ -228,7 +228,7 @@ Item {
                     required property var modelData
                     width: wifiListView.width
                     height: 30
-                    radius: 6
+                    radius: 1
                     color: modelData.active ? Qt.rgba(dropdownRoot.accent.r, dropdownRoot.accent.g, dropdownRoot.accent.b, 0.25) : dropdownRoot.softFill
                     border.color: modelData.active ? dropdownRoot.accent : dropdownRoot.borderCol
                     border.width: modelData.active ? 1 : 0
