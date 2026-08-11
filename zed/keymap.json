@@ -24,10 +24,10 @@
       "ctrl-:": [
         "editor::ToggleComments",
         {
-          "advance_downwards": false
-        }
-      ]
-    }
+          "advance_downwards": false,
+        },
+      ],
+    },
   },
   {
     "context": "Editor",
@@ -35,36 +35,41 @@
       "ctrl-/": [
         "editor::ToggleComments",
         {
-          "advance_downwards": false
-        }
-      ]
-    }
+          "advance_downwards": false,
+        },
+      ],
+    },
   },
   {
     "context": "Workspace",
     "bindings": {
-      "ctrl-'": "terminal_panel::Toggle"
-    }
+      "ctrl-'": "terminal_panel::Toggle",
+    },
   },
   {
     "context": "Workspace",
     "unbind": {
-      "ctrl-`": "terminal_panel::Toggle"
-    }
+      "ctrl-`": "terminal_panel::Toggle",
+    },
   },
   {
     "bindings": {
-      "ctrl-alt-shift-h": "workspace::ToggleHelixMode"
-    }
+      "ctrl-alt-shift-h": "workspace::ToggleHelixMode",
+    },
   },
   {
     "bindings": {
-      "ctrl-g": "git_panel::Toggle"
-    }
+      "ctrl-g": "git_panel::Toggle",
+    },
   },
   {
     "bindings": {
-      "ctrl-b": "project_panel::Toggle"
-    }
-  }
+      "ctrl-b": "project_panel::Toggle",
+    },
+  },
+  {
+    "bindings": {
+      "=": ["workspace::SendKeystrokes", "escape"],
+    },
+  },
 ]

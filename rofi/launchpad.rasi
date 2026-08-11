@@ -1,5 +1,6 @@
 configuration {
-    modi: "drun";
+    /* Voeg calc toe als custom modus, plus window, run en filebrowser */
+    modi: "drun,calc:/home/alberic/.config/rofi/calc.sh,window,run,filebrowser";
     show-icons: true;
     drun-display-format: "{name}";
     font: "Inter 11";
@@ -14,7 +15,7 @@ configuration {
 
     /* Zorg dat apps altijd alfabetisch gesorteerd staan (zoals macOS) */
     sorting-method: "normal";
-    disable-history: true;
+    disable-history: false;
 }
 
 * {
@@ -24,10 +25,10 @@ configuration {
 
 window {
     transparency: "real";
-    background-color: #191923d9;
-    border: 1px solid;
+    background-color: #00020840;
+    border: 2px solid;
     border-color: #ffffff26;
-    border-radius: 20px;
+    border-radius: 15px;
     width: 900px;
     padding: 28px;
     location: center;
@@ -44,51 +45,55 @@ inputbar {
     border: 1px solid;
     border-color: #ffffff1f;
     border-radius: 12px;
-    padding: 12px 16px;
+    padding: 15px 20px;
     children: [ entry ];
 }
 
 entry {
-    placeholder: "  Zoeken...";
+    placeholder: "   Search...";
     placeholder-color: #ffffff66;
     text-color: #ffffff;
 }
 
 listview {
-    columns: 5;
+    columns: 6;
     lines: 3;
     cycle: true;
-    scrollbar: false;
-    flow: horizontal; /* Vult van links naar rechts ipv boven naar beneden */
-    spacing: 24px;
+    scrollbar: true;
+    flow: horizontal;
+    spacing: 4px;
     fixed-height: true;
     fixed-columns: true;
 }
 
 element {
     orientation: vertical;
-    padding: 16px 8px;
-    border-radius: 16px;
+    padding: 6px 2px;
+    border-radius: 12px;
     background-color: transparent;
     border: 0px;
+    width: 80px;
+    margin: 20px 14px;
 }
 
 element selected {
-    background-color: #ffffff50;
+    background-color: #ffffff30;
     border: 0px;
 }
 
 element-icon {
     size: 80px;
     horizontal-align: 0.5;
-    margin: 0px 0px 12px 0px;
+    margin: 0px 0px 0px 0px;
 }
 
 element-text {
     horizontal-align: 0.5;
     vertical-align: 0.5;
-    margin: 8px 0px 0px 0px;
-    text-color: #ffffff99;
+        padding: 0px 3px 2px 3px;       /* groter maken = smallere naam */
+        width: 10ch;
+    margin: 2px 2px 4px 2px;
+    text-color: #ffffff90;
 }
 
 element selected element-text {
