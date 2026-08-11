@@ -1,0 +1,96 @@
+configuration {
+    modi: "drun";
+    show-icons: true;
+    drun-display-format: "{name}";
+    font: "Inter 11";
+
+    /* Pagina-navigatie strikt beperken tot toetsenbord */
+    kb-pageup: "Page_Up";
+    kb-pagedown: "Page_Down";
+
+    /* Muis-scrollwiel expliciet koppelen aan 1 rij omhoog/omlaag */
+    ms-rowup: "ScrollUp";
+    ms-rowdown: "ScrollDown";
+
+    /* Zorg dat apps altijd alfabetisch gesorteerd staan (zoals macOS) */
+    sorting-method: "normal";
+    disable-history: true;
+}
+
+* {
+    background-color: transparent;
+    text-color: #f3f3f3;
+}
+
+window {
+    transparency: "real";
+    background-color: #191923d9;
+    border: 1px solid;
+    border-color: #ffffff26;
+    border-radius: 20px;
+    width: 900px;
+    padding: 28px;
+    location: center;
+    anchor: center;
+}
+
+mainbox {
+    children: [ inputbar, listview ];
+    spacing: 24px;
+}
+
+inputbar {
+    background-color: #ffffff14;
+    border: 1px solid;
+    border-color: #ffffff1f;
+    border-radius: 12px;
+    padding: 12px 16px;
+    children: [ entry ];
+}
+
+entry {
+    placeholder: "  Zoeken...";
+    placeholder-color: #ffffff66;
+    text-color: #ffffff;
+}
+
+listview {
+    columns: 5;
+    lines: 3;
+    cycle: true;
+    scrollbar: false;
+    flow: horizontal; /* Vult van links naar rechts ipv boven naar beneden */
+    spacing: 24px;
+    fixed-height: true;
+    fixed-columns: true;
+}
+
+element {
+    orientation: vertical;
+    padding: 16px 8px;
+    border-radius: 16px;
+    background-color: transparent;
+    border: 0px;
+}
+
+element selected {
+    background-color: #ffffff50;
+    border: 0px;
+}
+
+element-icon {
+    size: 80px;
+    horizontal-align: 0.5;
+    margin: 0px 0px 12px 0px;
+}
+
+element-text {
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    margin: 8px 0px 0px 0px;
+    text-color: #ffffff99;
+}
+
+element selected element-text {
+    text-color: #ffffff;
+}

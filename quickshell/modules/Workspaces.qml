@@ -2,22 +2,14 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io  // <-- VOEG DIT TOE
 
-RowLayout {
-    id: wsRow
-    spacing: 3
+ColumnLayout {
+    id: wsColumn
+    spacing: 4
+    Layout.alignment: Qt.AlignHCenter
 
-    // persistent-workspaces: "*": 6  -> toon altijd workspace 1..6
-    property int persistentCount: 6
-
-    property var icons: ({
-            "1": "",
-            "2": "",
-            "3": "",
-            "4": "",
-            "5": "",
-            "6": ""
-        })
+    property int persistentCount: 9
 
     Repeater {
         model: persistentCount
@@ -25,27 +17,38 @@ RowLayout {
             id: pill
             required property int index
             property int wsId: index + 1
-            property bool isActive: Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === wsId
-            property bool isEmpty: {
-                for (const ws of Hyprland.workspaces.values) {
-                    if (ws.id === wsId)
-                        return false;
-                }
-                return true;
+
+            // 1. Is dit de actieve/gefocuste workspace?
+            property bool isActive: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === wsId
+
+            // 2. Staan er geopende vensters op dit werkblad?
+            property bool hasWindows: {
+                if (!Hyprland.toplevels)
+                    return false;
+                return Hyprland.toplevels.values.some(t => t.workspace && t.workspace.id === wsId);
             }
+
             property bool hovered: false
 
-            Layout.preferredHeight: 6
-            Layout.preferredWidth: isActive ? 65 : (isEmpty ? 20 : 40)
-            Layout.alignment: Qt.AlignVCenter
-            radius: 100
-            color: isActive ? "#fff7e5" : (hovered ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(1, 1, 1, 0.25))
+            // Drie dynamische hoogtes:
+            // - Actieve workspace: 65px
+            // - Niet-actief maar WEL met open venster(s): 40px
+            // - Niet-actief en HELEMAAL leeg: 20px
+            property real targetHeight: isActive ? 65 : (hasWindows ? 40 : 20)
 
-            Behavior on Layout.preferredWidth {
+            Behavior on targetHeight {
                 NumberAnimation {
-                    duration: 1
+                    duration: 150
+                    easing.type: Easing.OutCubic
                 }
             }
+
+            Layout.preferredWidth: 9
+            Layout.preferredHeight: targetHeight
+            Layout.alignment: Qt.AlignHCenter
+            radius: 100
+            color: isActive ? "#99ffffff" : (hovered ? Qt.rgba(1, 1, 1, 0.55) : Qt.rgba(1, 1, 1, 0.25))
+
             Behavior on color {
                 ColorAnimation {
                     duration: 100
@@ -59,7 +62,22 @@ RowLayout {
                 onExited: pill.hovered = false
 
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
-                onClicked: Hyprland.dispatch("workspace " + pill.wsId)
+                onClicked: mouse => {
+                    // Hyprland >= 0.55 gebruikt Lua-dispatchers (hl.dsp.*) i.p.v. de oude
+                    // platte "workspace 2" / "movetoworkspace 2" strings. Daarom via hyprctl
+                    // met een Lua-expressie als argument i.p.v. Hyprland.dispatch().
+                    if (mouse.button === Qt.LeftButton) {
+                        dispatchProcess.command = ["hyprctl", "dispatch", "hl.dsp.focus({workspace = " + pill.wsId.toString() + "})"];
+                        dispatchProcess.running = true;
+                    } else if (mouse.button === Qt.RightButton) {
+                        dispatchProcess.command = ["hyprctl", "dispatch", "hl.dsp.window.move({workspace = " + pill.wsId.toString() + "})"];
+                        dispatchProcess.running = true;
+                    }
+                }
+            }
+
+            Process {
+                id: dispatchProcess
             }
         }
     }
