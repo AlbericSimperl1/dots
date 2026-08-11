@@ -69,7 +69,7 @@
   },
   {
     "bindings": {
-      "=": ["workspace::SendKeystrokes", "escape"],
+      "µ": ["workspace::SendKeystrokes", "escape"],
     },
   },
 ]
